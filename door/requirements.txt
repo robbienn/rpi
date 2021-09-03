@@ -1,0 +1,5 @@
+raspberrypi-tm1637
+RPi.GPIO
+board
+adafruit-circuitpython-sht31d
+
