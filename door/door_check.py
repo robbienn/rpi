@@ -17,6 +17,8 @@ MIN_UPLOAD_TIME_DELTA = 15
 EVENT_DOOR_CLOSED = "CLOSED"
 EVENT_DOOR_OPENED= "OPENED"
 
+NOTE_DURATION = 0.15
+
 SPEAKERPORT = 17
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(SPEAKERPORT, GPIO.OUT)
@@ -65,19 +67,19 @@ def tone(note, duration):
     time.sleep(0.01)
 
 def openedSound():
-    tone('C3', 0.2)
-    tone('D3', 0.2)
-    tone('E3', 0.2)
-    tone('F3', 0.2)
-    tone('G3', 0.2)
+    tone('C3', NOTE_DURATION)
+    tone('D3', NOTE_DURATION)
+    tone('E3', NOTE_DURATION)
+    #tone('F3', NOTE_DURATION)
+    #tone('G3', NOTE_DURATION)
 
 
 def closedSound():
-    tone('G3', 0.2)
-    tone('F3', 0.2)
-    tone('E3', 0.2)
-    tone('D3', 0.2)
-    tone('C3', 0.2)
+    #tone('G3', NOTE_DURATION)
+    #tone('F3', NOTE_DURATION)
+    tone('E3', NOTE_DURATION)
+    tone('D3', NOTE_DURATION)
+    tone('C3', NOTE_DURATION)
 
 
 '''
@@ -163,10 +165,10 @@ def uploadToThingSpeak(event, timestamp, duration, temperature, humidity):
 
         if lastTimeUpload is not None:
             delta = getDuration(lastTimeUpload, now)
-            print("TIME-DELTA:", delta)
+            print("Seconds between uploads", delta)
             if delta < MIN_UPLOAD_TIME_DELTA:
                 timeToSleep = MIN_UPLOAD_TIME_DELTA - delta
-                print("SLEED: ", timeToSleep)
+                print("Sleep before upload to thingspeak: ", timeToSleep)
                 showCountDown(timeToSleep)         
 
         params = urllib.parse.urlencode(
@@ -243,7 +245,7 @@ while True:
             dca = doorClosedAt.strftime("%Y-%m-%d_%H:%M:%S")
             print("Dvere zavreny v:", dca)
 
-            closedSound()
+            #closedSound()
             duration = getDuration(doorOpenedAt, doorClosedAt)
             print("Doba otevreni: ", duration)
 
@@ -259,7 +261,7 @@ while True:
             doa = doorOpenedAt.strftime("%Y-%m-%d_%H:%M:%S")
             print("Dvere otevreny v:", doa)
 
-            openedSound()
+            #openedSound()
             duration = getDuration(doorClosedAt, doorOpenedAt)
             print("Doba zavreni: ", duration)
 
