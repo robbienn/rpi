@@ -1,0 +1,4 @@
+adafruit-circuitpython-sht31d
+adafruit-circuitpython-ssd1306
+adafruit-circuitpython-bmp280
+Pillow

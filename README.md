@@ -1,6 +1,6 @@
 # rpi
 Raspberry Pi Live projects
 
-rpi3 - running on RPI3
-zero - running on RPi Zero
+door - running on RPi Zero
+zahrada - running on RPi3
 
