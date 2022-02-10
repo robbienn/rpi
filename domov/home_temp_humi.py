@@ -10,8 +10,8 @@ import adafruit_sht31d
 
 LOOP_SLEEP = 60*5 # in seconds
 
-#LOCATION = "OP" # obyvacoi pokoj
-LOCATION = "PR" # predsin
+LOCATION = "OP" # obyvaci pokoj
+#LOCATION = "PR" # predsin
 
 SERVER_URL = "api.thingspeak.com:80"
 channel_id = 685565
@@ -67,8 +67,8 @@ sensor = adafruit_sht31d.SHT31D(i2c)
 
 while True:
 
-    temp = sensor.temperature
-    humi = sensor.relative_humidity
+    temp = round(sensor.temperature, 1)
+    humi = round(sensor.relative_humidity, 1)
 
     now = datetime.datetime.now()
     print("Timestamp: ", now)
