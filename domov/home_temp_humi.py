@@ -6,26 +6,34 @@ import http.client, urllib
 import board
 import adafruit_sht31d
 
-# Thingspeak
-
 LOOP_SLEEP = 60*5 # in seconds
 
-LOCATION = "OP" # obyvaci pokoj
-#LOCATION = "PR" # predsin
+LOCATION_FILE = "/home/pi/location"
 
+# Thingspeak
 SERVER_URL = "api.thingspeak.com:80"
 channel_id = 685565
 write_key  = "ZIVF3B55MTQJR5SY"
 
 ################################################################################
+
+def getLocation():
+
+    #LOCATION = "OP" # obyvaci pokoj
+    #LOCATION = "PR" # predsin
+    #LOCATION = "LD" # lodzie
+    #LOCATION = "DP" # detsky pokoj
+
+    f = open(LOCATION_FILE, "r")
+    return (f.readline().strip())
+
 def getTemperature():
     return round(sensor.temperature, 1)
 
 def getHumidity():
     return round(sensor.relative_humidity, 1)
 
-
-def uploadToThingSpeak(temperature, humidity):
+def uploadToThingSpeak(temperature, humidity,):
 
         #to_log = str(timestamp) + ' - T1={0:0.1f}*C H={1:0.1f}% P={2:0.1f} T2={3:0.1f}*C'.format(temperature, humidity, pressure, temperature2)
 
@@ -35,6 +43,10 @@ def uploadToThingSpeak(temperature, humidity):
             params = urllib.parse.urlencode( {'field1': temperature, 'field2': humidity, 'key': write_key} )
         elif (LOCATION == "PR"):
             params = urllib.parse.urlencode( {'field3': temperature, 'field4': humidity, 'key': write_key} )
+        elif (LOCATION == "LD"):
+            params = urllib.parse.urlencode( {'field5': temperature, 'field6': humidity, 'key': write_key} )
+        elif (LOCATION == "DP"):
+            params = urllib.parse.urlencode( {'field7': temperature, 'field8': humidity, 'key': write_key} )
         else:
             print("WRONG LOCATION")
             return -1
@@ -65,6 +77,8 @@ def uploadToThingSpeak(temperature, humidity):
 i2c = board.I2C()
 sensor = adafruit_sht31d.SHT31D(i2c)
 
+LOCATION = getLocation()
+
 while True:
 
     temp = round(sensor.temperature, 1)
@@ -72,7 +86,7 @@ while True:
 
     now = datetime.datetime.now()
     print("Timestamp: ", now)
-    print("Location: ", LOCATION)
+    print("Location:", LOCATION)
     print("\nTemperature: %0.1f C" % temp)
     print("Humidity: %0.1f %%" % humi)
     print("-----------")
