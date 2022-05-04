@@ -5,6 +5,7 @@ import RPi.GPIO as GPIO
 import http.client, urllib
 import board
 import adafruit_sht31d
+import logging
 
 LOOP_SLEEP = 60*5 # in seconds
 
@@ -48,7 +49,7 @@ def uploadToThingSpeak(temperature, humidity,):
         elif (LOCATION == "DP"):
             params = urllib.parse.urlencode( {'field7': temperature, 'field8': humidity, 'key': write_key} )
         else:
-            print("WRONG LOCATION")
+            logging.error("WRONG LOCATION")
             return -1
 
         headers = {"Content-type": "application/x-www-form-urlencoded","Accept": "text/plain"}
@@ -56,28 +57,32 @@ def uploadToThingSpeak(temperature, humidity,):
         try:
                 conn.request("POST", "/update", params, headers)
                 response = conn.getresponse()
-                print (response.status, response.reason)
+                logging.info("Response: %s %s", response.status, response.reason)
                 data = response.read()
                 conn.close()
                 #to_log += " - " + str(response.status) + " " + str(response.reason)
         except:
                 #to_log += " - Connection to " + SERVER_URL + " failed!"
-                print("POST error")
-
-
-        #print(to_log)
-        #logging.info(to_log)
-
+                logging.error("POST error")
 
 
 
 #################################################################################
 
 # Create sensor object, communicating over the board's default I2C bus
+logging.basicConfig(
+        level=logging.DEBUG, 
+        format='%(asctime)s %(levelname)s %(message)s', 
+        handlers=[logging.FileHandler('home_temp_humi.log'), logging.StreamHandler()]
+)
+logging.info("=======================================")
+logging.info("HOME TEMP HUMI - START")
+
 i2c = board.I2C()
 sensor = adafruit_sht31d.SHT31D(i2c)
 
 LOCATION = getLocation()
+logging.info("LOCATION: %s", LOCATION)
 
 while True:
 
@@ -85,21 +90,17 @@ while True:
     humi = round(sensor.relative_humidity, 1)
 
     now = datetime.datetime.now()
-    print("Timestamp: ", now)
-    print("Location:", LOCATION)
-    print("\nTemperature: %0.1f C" % temp)
-    print("Humidity: %0.1f %%" % humi)
-    print("-----------")
+    logging.info("Temperature: %0.1f C" % temp)
+    logging.info("Humidity: %0.1f %%" % humi)
 
     sensor.heater = True
-    print("Sensor Heater status =", sensor.heater)
+    logging.debug("Sensor Heater status = %s", sensor.heater)
     time.sleep(1)
     sensor.heater = False
-    print("Sensor Heater status =", sensor.heater)
-    print("--------------------------------")
+    logging.debug("Sensor Heater status = %s", sensor.heater)
 
     uploadToThingSpeak(temp, humi)
 
     time.sleep(LOOP_SLEEP)
 
-
+logging.info("HOME TEMP HUMI - END")
